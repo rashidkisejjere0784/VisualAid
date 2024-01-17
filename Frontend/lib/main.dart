@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'utils/speech_implementation.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+
   const MyApp({super.key});
 
   // This widget is the root of your application.
@@ -31,7 +33,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Flutter awesome Home Page'),
     );
   }
 }
@@ -56,8 +58,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  Speak speak = Speak();
+  final TextEditingController controller = TextEditingController();
 
-  void _incrementCounter() {
+  void _incrementCounter() async {
+    speak.say(controller.text);
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -112,6 +117,15 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            ElevatedButton(onPressed: (){
+              speak.pause();
+            }, child: const Text("pause")),
+            ElevatedButton(onPressed: (){
+              speak.stop();
+            }, child: const Text("stop")),
+            TextFormField(
+              controller: controller,
+            )
           ],
         ),
       ),
