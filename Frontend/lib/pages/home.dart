@@ -1,12 +1,14 @@
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
-import 'package:therapp2/api/speech_api.dart';
-import 'package:therapp2/commands.dart';
+import 'package:therapp2/core/speech_to_text.dart';
+import 'package:therapp2/command.dart';
 import 'package:therapp2/widget/substring_highlight.dart';
+import 'package:therapp2/core/ml_model_predict.dart';
+import 'package:therapp2/utils/speech/speech_implementation.dart';
 
-class SpeechToText extends StatefulWidget {
-  const SpeechToText({super.key, required this.title});
+class Home extends StatefulWidget {
+  const Home({super.key, required this.title});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -19,12 +21,21 @@ class SpeechToText extends StatefulWidget {
   // always marked "final".
 
   @override
-  State<SpeechToText> createState() => _SpeechToTextState();
+  State<Home> createState() => _HomeState();
 }
-
-class _SpeechToTextState extends State<SpeechToText> {
+class _HomeState extends State<Home> {
   String text = 'Press the button and start speaking';
   bool isListening = false;
+  late ModelAssistant model;
+  Speak speak = Speak();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    model = ModelAssistant();
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -49,21 +60,34 @@ class _SpeechToTextState extends State<SpeechToText> {
         ),
       ],
     ),
-    body: SingleChildScrollView(
-      reverse: true,
-      padding: const EdgeInsets.all(30).copyWith(bottom: 150),
-      child: SubstringHighlight(
-        text: text,
-        terms: Command.all,
-        textStyle: const TextStyle(
-          fontSize: 32.0,
-          color: Colors.black,
-          fontWeight: FontWeight.w400,
-        ),
-        textStyleHighlight: const TextStyle(
-          fontSize: 32.0,
-          color: Colors.red,
-          fontWeight: FontWeight.w400,
+    body: GestureDetector(
+      onLongPress: () => toggleRecording(),
+      child: Container(
+        color: Colors.transparent,
+        width: double.infinity,
+        height: double.infinity,
+        child: SingleChildScrollView(
+          reverse: true,
+          padding: const EdgeInsets.all(30).copyWith(bottom: 150),
+          child: Column(
+            children: [
+              SubstringHighlight(
+                text: text,
+                terms: Command.all,
+                textStyle: const TextStyle(
+                  fontSize: 32.0,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w400,
+                ),
+                textStyleHighlight: const TextStyle(
+                  fontSize: 32.0,
+                  color: Colors.red,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+
+            ],
+          ),
         ),
       ),
     ),
@@ -72,7 +96,8 @@ class _SpeechToTextState extends State<SpeechToText> {
       animate: isListening,
       glowColor: Theme.of(context).primaryColor,
       child: FloatingActionButton(
-        onPressed: toggleRecording,
+        onPressed: () {
+        }, // Empty onPressed to avoid the default FloatingActionButton
         shape: const CircleBorder(),
         child: Icon(isListening ? Icons.mic : Icons.mic_none, size: 36),
       ),
@@ -86,7 +111,8 @@ class _SpeechToTextState extends State<SpeechToText> {
 
         if (!isListening) {
           Future.delayed(const Duration(seconds: 1), () {
-            Utils.scanText(text);
+            String predicted = model.predict(text);
+            speak.say(predicted, rate: 0.4);
           });
         }
       });
