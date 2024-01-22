@@ -61,7 +61,7 @@ class _HomeState extends State<Home> {
       ],
     ),
     body: GestureDetector(
-      onLongPress: () => toggleRecording(),
+      onLongPress: () => toggleRecording(), //starts the recording
       child: Container(
         color: Colors.transparent,
         width: double.infinity,
