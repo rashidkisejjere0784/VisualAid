@@ -5,8 +5,8 @@ import 'dart:math';
 
 class ModelAssistant{
   late Interpreter interpreter;
-  var input = [[]];
-  Random _random = Random();
+  var input = [[]]; // this represents what the user is saying numerically
+  Random _random = Random(); //to be used to randomly response
 
   ModelAssistant(){
     _initModel();
@@ -16,11 +16,11 @@ class ModelAssistant{
     interpreter = await Interpreter.fromAsset('assets/ml_model/model.tflite');
   }
 
-  void _generateInput(String text){
+  void _generateInput(String text){ //method used to encode what the user has said
     text = text.toLowerCase();
     text = text.replaceAll(RegExp(r"[!#$%&'()*+,-./:;<=>?@[]^_`{|}~]"), "");
     var tokens = text.split(" ");
-    var input = [];
+    var input = [];// this array contains all the words said by the user
 
     for (String word in vocabulary){
       if(tokens.contains(word)){
@@ -35,7 +35,7 @@ class ModelAssistant{
 
   }
 
-  String predict(String text){
+  String predict(String text){ //method used to predict what the user is saying
     _generateInput(text);
 
     List output = List.filled(classes.length, 0).reshape([1, classes.length]);
