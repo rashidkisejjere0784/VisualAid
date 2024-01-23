@@ -1,17 +1,19 @@
 from flask import Blueprint, request, url_for, redirect, render_template, flash, jsonify
-from PIL import Image
-import pytesseract
+from .gcloud_vision import detect_text
 
 reading_app = Blueprint('reading_app', __name__)
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 @reading_app.route("/extract_img", methods = ["POST"])
 def home():
     try:
         img_file = request.files["image"]
-        text = pytesseract.image_to_string(Image.open(img_file))
         
-    
+        # Check if the file has a name and is not empty
+        if img_file.filename == '' or img_file.read() == b'':
+            return jsonify({'error': 'Invalid file'}), 400
+            
+        text = detect_text(img_file.read())
+        
         return jsonify({
             "Message" : text
         })
