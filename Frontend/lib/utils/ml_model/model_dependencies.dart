@@ -1,5 +1,4 @@
-//The Bag of Words Used by the model
-
+//The bag of words expected to be used by the model
 final vocabulary = [
   "a", "about", "access", "accessible", "account", "adapt", "adopting",
   "advancements", "advice", "africa", "ahead", "aloud", "an", "analyze", "and", "appear", "apps", "are", "area",
@@ -21,4 +20,5 @@ final vocabulary = [
   "way", "western", "what", "whats", "whereabouts", "why", "with", "within", "work", "workout", "written", "you", "your",
 ];
 
+// classification of the user's instructions
 final classes = ['Instruction', 'Action', 'Irrelevant', 'hardware', 'software'];
