@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:therapp2/pages/home.dart';
+import 'package:therapp2/services/pages/home.dart';
+import 'package:get/get.dart';
+import 'package:therapp2/routes/routes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,7 +14,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -33,7 +35,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const Home(title: "title"),
+      initialRoute: Routes.home,
+      getPages: AppRoutes.routes,
     );
   }
 }

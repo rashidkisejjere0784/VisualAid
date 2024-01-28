@@ -2,8 +2,8 @@ import 'package:speech_to_text/speech_to_text.dart';
 import 'package:flutter/cupertino.dart';
 
 class SpeechApi {
-  static final _speech = SpeechToText();
-  static Future<bool> toggleRecording({
+  final _speech = SpeechToText();
+  Future<bool> toggleRecording({
     required Function(String text) onResult,
     required ValueChanged<bool> onListening,
   }) async {

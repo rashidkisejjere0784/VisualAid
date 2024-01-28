@@ -1,4 +1,4 @@
-import 'package:therapp2/core/convert_to_speech.dart';
+import 'package:therapp2/services/core/speech/convert_to_speech.dart';
 
 class Speak{
   late SpeechState speech;

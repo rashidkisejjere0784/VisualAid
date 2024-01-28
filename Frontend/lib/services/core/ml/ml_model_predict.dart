@@ -1,6 +1,6 @@
 import 'package:tflite_flutter/tflite_flutter.dart';
-import 'package:therapp2/utils/ml_model/model_dependencies.dart';
-import 'package:therapp2/utils/ml_model/model_responses.dart';
+import 'package:therapp2/services/utils/ml_model/model_dependencies.dart';
+import 'package:therapp2/services/utils/ml_model/model_responses.dart';
 import 'dart:math';
 
 class ModelAssistant{
@@ -48,7 +48,7 @@ class ModelAssistant{
     }
 
     var predClass = classes[index];
-    return "This is predicted to be $predClass";
+    return predClass;
   }
 
   int _getMaxIndex(List elements){

@@ -1,40 +1,54 @@
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
-import 'package:therapp2/core/speech_to_text.dart';
 import 'package:therapp2/command.dart';
-import 'package:therapp2/widget/substring_highlight.dart';
-import 'package:therapp2/core/ml_model_predict.dart';
-import 'package:therapp2/utils/speech/speech_implementation.dart';
+import 'package:therapp2/services/widget/substring_highlight.dart';
+import 'package:therapp2/services/utils/classes_list/class_list.dart';
+import 'package:therapp2/controllers/globalController.dart';
+import 'package:get/get.dart';
+import 'package:therapp2/routes/routes.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key, required this.title});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
   final String title;
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   @override
   State<Home> createState() => _HomeState();
 }
 class _HomeState extends State<Home> {
-  String text = 'Press the button and start speaking';
-  bool isListening = false;
-  late ModelAssistant model;
-  Speak speak = Speak();
+  final controller = Get.find<GlobalController>();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    controller.init();
 
-    model = ModelAssistant();
+    controller.onSpeechResult = (SpeechRecognitionResult result) async {
+      // Your custom implementation here
+      controller.text(result.recognizedWords);
+
+      if (!controller.speechToText.isListening){
+        print("perfect");
+        String predicted = controller.modelAssistant.predict(controller.text.value);
+        print(predicted);
+        controller.speak.say(predicted, rate: 0.4);
+
+        if (predicted == instruction) {
+          Get.offAllNamed(AppRoutes.navigation);
+        }
+      }
+    };
+  }
+
+  @override
+  void dispose() {
+    print("disposed");
+    super.dispose();
+
   }
 
   @override
@@ -44,11 +58,12 @@ class _HomeState extends State<Home> {
       title: Text(widget.title),
       centerTitle: true,
       actions: [
+
         Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.content_copy),
             onPressed: () async {
-              await FlutterClipboard.copy(text);
+              await FlutterClipboard.copy(controller.text.value);
 
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -61,7 +76,10 @@ class _HomeState extends State<Home> {
       ],
     ),
     body: GestureDetector(
-      onLongPress: () => toggleRecording(), //starts the recording
+      onLongPress: () {
+        controller.startListening();
+        controller.isListening(true);
+      }, //starts the recording
       child: Container(
         color: Colors.transparent,
         width: double.infinity,
@@ -71,8 +89,8 @@ class _HomeState extends State<Home> {
           padding: const EdgeInsets.all(30).copyWith(bottom: 150),
           child: Column(
             children: [
-              SubstringHighlight(
-                text: text,
+              Obx(() => SubstringHighlight(
+                text: controller.text.value,
                 terms: Command.all,
                 textStyle: const TextStyle(
                   fontSize: 32.0,
@@ -85,6 +103,7 @@ class _HomeState extends State<Home> {
                   fontWeight: FontWeight.w400,
                 ),
               ),
+              )
 
             ],
           ),
@@ -92,28 +111,18 @@ class _HomeState extends State<Home> {
       ),
     ),
     floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    floatingActionButton: AvatarGlow(
-      animate: isListening,
+    floatingActionButton: Obx(() => AvatarGlow(
+      animate: controller.isListening.value,
       glowColor: Theme.of(context).primaryColor,
       child: FloatingActionButton(
         onPressed: () {
-        }, // Empty onPressed to avoid the default FloatingActionButton
+          // Empty onPressed to avoid the default FloatingActionButton
+        },
         shape: const CircleBorder(),
-        child: Icon(isListening ? Icons.mic : Icons.mic_none, size: 36),
+        child: Icon(controller.isListening.value ? Icons.mic : Icons.mic_none, size: 36),
       ),
-    ),
+    )),
+
   );
 
-  Future toggleRecording() => SpeechApi.toggleRecording(
-      onResult: (text) => setState(() => this.text = text),
-      onListening: (isListening) {
-        setState(() => this.isListening = isListening);
-
-        if (!isListening) {
-          Future.delayed(const Duration(seconds: 1), () {
-            String predicted = model.predict(text);
-            speak.say(predicted, rate: 0.4);
-          });
-        }
-      });
 }
