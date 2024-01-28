@@ -1,6 +1,7 @@
 .venv
 __pycache__
 BACKEND/credentials
+Frontend/lib/services/core/links_and_keys/api_keys.dart
 # Miscellaneous
 *.class
 *.log
