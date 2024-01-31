@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:location/location.dart';
+import 'package:therapp2/services/core/links_and_keys/api_keys.dart';
 
 class GetLocation extends GetObserver {
   late Location location = Location();
@@ -48,7 +49,7 @@ class GetLocation extends GetObserver {
 
 
   Future getPlaceId(double latitude, double longitude) async {
-    const apiKey = 'AIzaSyAywia2PyE6_PS8sEnaxugF_QhWD7d2u_I'; // Replace with your API key
+    final apiKey = GOOGLE_API_KEY; // Replace with your API key
     final apiUrl =
         'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$apiKey';
 
