@@ -8,7 +8,7 @@ class Speak{
     speech.initTts();
   }
 
-  Future<void> say(String text, {double rate = 0.7, double pitch = 1, double volume = 1})async {
+  Future<void> say(String text, {double rate = 0.5, double pitch = 1, double volume = 1})async {
     speech.newVoiceText = text;
     speech.volume = volume;
     speech.rate = rate;

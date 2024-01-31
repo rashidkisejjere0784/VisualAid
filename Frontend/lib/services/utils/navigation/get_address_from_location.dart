@@ -1,6 +1,7 @@
 // location_helper.dart
 import 'package:geocoding/geocoding.dart';
-Future<String> getUserAddress(double latitude, double longitude) async {
+
+Future<Map> getUserAddress(double latitude, double longitude) async {
   try {
     // Reverse geocoding to get the address from coordinates
     List<Placemark> placemarks = await placemarkFromCoordinates(
@@ -8,7 +9,9 @@ Future<String> getUserAddress(double latitude, double longitude) async {
       longitude,
     );
     final placemark = placemarks[0];
+    print(placemark);
 
+    String name = placemark.name ?? "";
     String street = placemark.street ?? "";
     String country = placemark.country ?? "";
     String postalCode = placemark.postalCode ?? "";
@@ -18,11 +21,18 @@ Future<String> getUserAddress(double latitude, double longitude) async {
     // You can access other properties as needed
 
     // Construct a formatted address
-    String formattedAddress = "$street, $locality, $administrativeArea, $country, $postalCode";
+    final formattedAddress = {
+      "placeId": name,
+      "country": country,
+      "full address":
+          "$street, $locality, $administrativeArea, $country, $postalCode"
+    };
 
     return formattedAddress;
   } catch (e) {
     print("Error: $e");
-    return "Error getting location";
+    return {
+      "Error" : "$e"
+    };
   }
 }

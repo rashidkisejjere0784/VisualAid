@@ -5,7 +5,7 @@ import 'package:therapp2/controllers/navigation_controller.dart';
 class NavigationBindings extends Bindings{
   @override
   void dependencies() {
-    Get.lazyPut(() => NavigationController());
+    Get.put(NavigationController());
     Get.put(GlobalController());
   }
 }
