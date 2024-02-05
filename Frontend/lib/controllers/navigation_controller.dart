@@ -17,6 +17,7 @@ class NavigationController extends GetxController{
   final placeId = "".obs;
   final currentInstruction = ''.obs;
   final currentUserDirection = "".obs;
+  final mode = 0.obs;
 
 
   void init(){
@@ -31,6 +32,9 @@ class NavigationController extends GetxController{
     });
   }
 
+  void setMode(int mode){
+    this.mode(mode);
+  }
 
   Future getDirections() async {
     Map response = {};

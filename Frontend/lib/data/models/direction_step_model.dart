@@ -1,6 +1,6 @@
 
 import 'distance_model.dart';
-import 'duration.dart';
+import 'duration_model.dart';
 import 'latlng_model.dart';
 
 class DirectionStep {

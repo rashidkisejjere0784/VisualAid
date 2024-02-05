@@ -47,7 +47,6 @@ class GetLocation extends GetObserver {
     };
   }
 
-
   Future getPlaceId(double latitude, double longitude) async {
     final apiKey = GOOGLE_API_KEY; // Replace with your API key
     final apiUrl =

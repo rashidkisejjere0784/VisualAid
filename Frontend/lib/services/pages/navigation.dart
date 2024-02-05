@@ -1,12 +1,13 @@
 import 'package:avatar_glow/avatar_glow.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:location/location.dart';
 import 'package:therapp2/controllers/globalController.dart';
 import 'package:therapp2/controllers/navigation_controller.dart';
+import 'package:therapp2/controllers/cameraController.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
-
 
 class Navigation extends StatefulWidget {
   Navigation({Key? key}) : super(key: key);
@@ -18,6 +19,7 @@ class Navigation extends StatefulWidget {
 class _NavigationState extends State<Navigation> {
   final controller = Get.find<GlobalController>();
   final navigationController = Get.find<NavigationController>();
+  final cameraController = Get.find<CCameraController>();
   int mode = 0;
 
   @override
@@ -25,13 +27,14 @@ class _NavigationState extends State<Navigation> {
     super.initState();
     controller.init();
     navigationController.init();
+    cameraController.init();
 
     initSpeech();
     controller.speak.say("Initializing Navigation Mode, please wait.");
     init();
     controller.speak.say(
         "Navigation Mode Initiated Successfully. Where do you want to go to ?");
-    mode = 1;
+    navigationController.setMode(1);
   }
 
   void init() async {
@@ -41,10 +44,12 @@ class _NavigationState extends State<Navigation> {
     navigationController.updatePlaceID(address['placeId']);
     navigationController.updateFrom(address['address']);
 
-    navigationController.location.location.onLocationChanged.listen((LocationData location){
-      if(mode == 5){
-        var instruction = navigationController.getInstruction(location.latitude!, location.longitude!);
-        if(instruction != navigationController.currentInstruction.value){
+    navigationController.location.location.onLocationChanged
+        .listen((LocationData location) {
+      if (navigationController.mode.value == 5) {
+        var instruction = navigationController.getInstruction(
+            location.latitude!, location.longitude!);
+        if (instruction != navigationController.currentInstruction.value) {
           navigationController.currentInstruction(instruction);
           controller.speak.say(instruction);
         }
@@ -60,13 +65,13 @@ class _NavigationState extends State<Navigation> {
       if (!controller.speechToText.isListening) {
         final text = result.recognizedWords;
         print(text);
-        if (mode == 1) {
+        if (navigationController.mode.value == 1) {
           //Destination Mode
           navigationController.updateDestination(text);
           controller.speak.say(
               "Please confirm whether you want to travel to $text By replying Yes or No");
-          mode = 2;
-        } else if (mode == 2) {
+          navigationController.setMode(2);
+        } else if (navigationController.mode.value == 2) {
           print("here");
           //Confimation Mode
           if (text.contains("yes")) {
@@ -83,28 +88,27 @@ class _NavigationState extends State<Navigation> {
 
             controller.speak
                 .say('$journey, Do you want to Start your journey ? Yes or No');
-            mode = 3;
+            navigationController.setMode(3);
+
           } else if (text.contains("no")) {
             controller.speak.say(
                 "Sorry for not getting that right, kindly repeat and try to be audible");
-            mode = 1;
+            navigationController.setMode(1);
           } else {
             controller.speak.say(
                 "I am unable to get what you meant there, please reply yes or no");
           }
-        } else if (mode == 3) {
+        } else if (navigationController.mode.value == 3) {
           final destination = navigationController.destination.value;
-          if(text.contains("no")) {
+          if (text.contains("no")) {
             controller.speak.say(
                 "Navigation to $destination cancelled, where do you want to go to instead ?");
-            mode = 1;
-          }
-          else if(text.contains("yes")){
+            navigationController.setMode(1);
+          } else if (text.contains("yes")) {
             controller.speak.say(
                 "Navigation to $destination Has Started, Kindly listen to the instructions");
-            mode = 5;
-          }
-          else{
+            navigationController.setMode(5);
+          } else {
             controller.speak.say(
                 "I am unable to get what you meant there, please reply yes or no");
           }
@@ -112,7 +116,6 @@ class _NavigationState extends State<Navigation> {
       }
     };
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -128,37 +131,53 @@ class _NavigationState extends State<Navigation> {
         child: Container(
           width: double.infinity,
           height: double.infinity,
-          color: Colors.green,
           child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    'Recognized words:',
-                    style: TextStyle(fontSize: 20.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    padding:const EdgeInsets.all(16),
+                    child: const Text(
+                      'Recognized words:',
+                      style: TextStyle(fontSize: 20.0),
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: Container(
-                      padding: EdgeInsets.all(16),
-                      child: Obx(
-                        () => Text(
-                          // If listening is active show the recognized words
-                          controller.isListening.value
-                              ? controller.text.value
-                              // If listening isn't active but could be tell the user
-                              // how to start it, otherwise indicate that speech
-                              // recognition is not yet ready or not supported on
-                              // the target device
-                              : controller.isInitialized.value
-                                  ? 'Tap the microphone to start listening...'
-                                  : 'Speech not available',
-                        ),
-                      )),
-                ),
-              ],
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    child: Obx(
+                      () => Text(
+                        // If listening is active show the recognized words
+                        controller.isListening.value
+                            ? controller.text.value
+                            : controller.isInitialized.value
+                                ? 'Tap the microphone to start listening...'
+                                : 'Speech not available',
+                      ),
+                    ),
+                  ),
+                  Obx(() {
+                    // Use Obx to reactively rebuild the widget when camera permission changes
+                    if (!cameraController.hasCameraPermission.value) {
+                      return const Center(
+                        child: Text('Camera permission denied.'),
+                      );
+                    }
+
+                    if(navigationController.mode != 5){
+                      return Container();
+                    }
+
+                    return Container(
+                      width: double.infinity,
+                      height: 500, // Set the desired height
+                      child: CameraPreview(
+                        cameraController.cameraController,
+                      ),
+                    );
+                  })
+                ],
+              ),
             ),
           ),
         ),
