@@ -6,24 +6,19 @@ os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "./credentials/visualaid-412011-7
 def detect_text(content):
     """Detects text in the file."""
 
+    # Instantiates a client
     client = vision.ImageAnnotatorClient()
 
     image = vision.Image(content=content)
 
+    # Performs text detection on the image file
     response = client.text_detection(image=image)
     texts = response.text_annotations
+
     print("Texts:")
-    extracted_text = ""
-
-    for text in texts:
-        extracted_text += str(text.description) + " "
-  
-
-    if response.error.message:
-        raise Exception(
-            "{}\nFor more info on error messages, check: "
-            "https://cloud.google.com/apis/design/errors".format(response.error.message)
-        )
-
+    texts_list = [{'description': text.description, 'bounding_box': [(vertex.x, vertex.y) for vertex in text.bounding_poly.vertices]} for text in texts]
     
-    return extracted_text
+    detected_text = " ".join([annotation['description'] for annotation in texts_list])
+
+
+    return detected_text

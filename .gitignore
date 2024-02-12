@@ -1,6 +1,7 @@
 .venv
 __pycache__
 BACKEND/credentials
+BACKEND/apps/Navigation/visualaid-412011-ec689afbd8e7.json
 Frontend/lib/services/core/links_and_keys/api_keys.dart
 # Miscellaneous
 *.class

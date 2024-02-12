@@ -12,7 +12,13 @@ def home():
         if img_file.filename == '' or img_file.read() == b'':
             return jsonify({'error': 'Invalid file'}), 400
             
-        text = detect_text(img_file.read())
+        img_file.seek(0)
+
+        # Read the image file in binary
+        image_binary = img_file.read()
+
+        # Pass the binary image data to the detect_text function
+        text = detect_text(image_binary)
         
         return jsonify({
             "Message" : text

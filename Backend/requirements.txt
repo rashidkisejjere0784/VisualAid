@@ -1,2 +1,4 @@
 Flask
-pytesseract
+vertexai
+google-cloud-aiplatform
+google-cloud
