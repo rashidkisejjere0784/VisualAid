@@ -1,10 +1,12 @@
 from flask import Flask
+import os
 
 # blueprint import
 from apps.Navigation.Views import navigation_app
 from apps.Reading.Views import reading_app
 
 def create_app():
+    
     app = Flask(__name__)
     # setup with the configuration provided
     app.config.from_object('config.DevelopmentConfig')
@@ -18,5 +20,5 @@ def create_app():
     
     return app
 
-if __name__ == "__main__":
-    create_app().run()
+app = create_app()
+app.run(debug=True, host="0.0.0.0", port=8080)
