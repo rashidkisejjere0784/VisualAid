@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:therapp2/services/pages/home.dart';
 import 'package:get/get.dart';
 import 'package:therapp2/routes/routes.dart';
 
@@ -35,7 +34,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute: Routes.home,
+      initialRoute: Routes.files,
       getPages: AppRoutes.routes,
     );
   }
