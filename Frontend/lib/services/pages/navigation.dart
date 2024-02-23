@@ -63,9 +63,25 @@ class _NavigationState extends State<Navigation> {
       controller.text(result.recognizedWords);
 
       if (!controller.speechToText.isListening) {
-        final text = result.recognizedWords;
-        print(text);
-        if (navigationController.mode.value == 1) {
+        final text = result.recognizedWords.trim().toLowerCase();
+
+        if( text.isEmpty){
+          return;
+        }
+        if(navigationController.mode.value == 5){
+          String pred = controller.modelAssistant.predict(text);
+
+          if(pred == "Action"){
+            await cameraController.captureImage(0).then((value) {
+              print(value);
+              if(value != null) {
+                controller.speak.say(value);
+              }
+            });
+          }
+        }
+
+        else if (navigationController.mode.value == 1) {
           //Destination Mode
           navigationController.updateDestination(text);
           controller.speak.say(
@@ -112,6 +128,8 @@ class _NavigationState extends State<Navigation> {
             controller.speak.say(
                 "I am unable to get what you meant there, please reply yes or no");
           }
+
+
         }
       }
     };
@@ -164,8 +182,16 @@ class _NavigationState extends State<Navigation> {
                       );
                     }
 
-                    if(navigationController.mode != 5){
+                    if(navigationController.mode.value != 5 ){
                       return Container();
+                    }
+
+                    if(!cameraController.isCameraInitialized.value){
+                      controller.speak.say("Camera is still Initializing");
+                      cameraController.init();
+                      return const Center(
+                        child: Text("Camera Still Initializing"),
+                      );
                     }
 
                     return Container(

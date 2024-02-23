@@ -21,7 +21,6 @@ class SpeechState extends State<Speech> {
   double rate = 0.5;
 
   String newVoiceText = "";
-  int? _inputLength;
 
   TtsState ttsState = TtsState.stopped;
 

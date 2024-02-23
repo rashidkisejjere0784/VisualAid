@@ -1,14 +1,14 @@
 import 'package:avatar_glow/avatar_glow.dart';
-import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
-import 'package:therapp2/command.dart';
-import 'package:therapp2/services/widget/substring_highlight.dart';
+import 'package:therapp2/services/widgets/substring_highlight.dart';
 import 'package:therapp2/services/utils/classes_list/class_list.dart';
 import 'package:therapp2/controllers/globalController.dart';
 import 'package:get/get.dart';
 import 'package:therapp2/routes/routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
+
+import '../../command.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key, required this.title});
@@ -57,23 +57,6 @@ class _HomeState extends State<Home> {
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       title: Text(widget.title),
       centerTitle: true,
-      actions: [
-
-        Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.content_copy),
-            onPressed: () async {
-              await FlutterClipboard.copy(controller.text.value);
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Copied to clipboard'),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
     ),
     body: GestureDetector(
       onLongPress: () {

@@ -118,7 +118,7 @@ class NoteFile extends StatelessWidget {
               label: "Tap to Navigate",
               backgroundColor: Palette.primary,
               foregroundColor: Palette.textColorBright,
-              overlayColor: Palette.primaryPressed,
+              overlayColor: Palette.primaryDark,
             ),
           ],
         ),
